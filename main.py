@@ -21,11 +21,11 @@ fc = [500, 5000]
 fs = 16000
 len_filter = 512
 if filter_mode.lower() == 'lowpass':
-    coeff_b = signal.firwin(len_filter, [1, fc[0]], nyq = fs//2, pass_zero = False)
+    coeff_b = signal.firwin(len_filter, [1, fc[0]], fs = fs, pass_zero = False)
 elif filter_mode.lower() == 'highpass':
-    coeff_b = signal.firwin(len_filter, [fc[1], fs//2 - 1], nyq = fs//2, pass_zero = False)
+    coeff_b = signal.firwin(len_filter, [fc[1], fs//2 - 1], fs = fs, pass_zero = False)
 elif filter_mode.lower() == 'bandpass':
-    coeff_b = signal.firwin(len_filter, [fc[0], fc[1]], nyq = fs//2, pass_zero = False)
+    coeff_b = signal.firwin(len_filter, [fc[0], fc[1]], fs = fs, pass_zero = False)
 else:
     raise ValueError('Select \'lowpass\', \'highpass\', or \'bandpass\' instead of \'{}\''.format(filter_mode))
     
@@ -46,7 +46,7 @@ if len(dis) < len(ref):
     
 for th in np.array([80, 70, 60, 50, 40, 30]):
     dis_, on_off = librosa.effects.trim(dis, top_db = th)
-    if (on_off[1] - on_off[0] > len(sig) * 0.80) and (on_off[1] - on_off[0] <= len(sig)):
+    if (on_off[1] - on_off[0] > len(sig) * 0.65) and (on_off[1] - on_off[0] <= len(sig)):
         break
 # Synchronize two audio signal
 # corr = fftconvolve(sig, dis_[::-1], mode = 'same')
@@ -77,7 +77,7 @@ fig = plt.figure(dpi = 50, figsize = (15, 18), facecolor = 'white')
 fig.suptitle('{} analysis'.format(filter_mode), fontsize = 32)
 ax = plt.subplot(3,2,1)
 ax.set(title = 'Source signal waveform')
-librosa.display.waveshow(sig, sr = fs, max_points = fs//2, x_axis = 'time')
+librosa.display.waveshow(sig, sr = fs, max_points = fs//2)
 plt.ylim([-0.7, 0.7])
 ax = plt.subplot(3,2,2)
 ax.set(title = 'Source signal spectrogram')
@@ -85,7 +85,7 @@ SIG = librosa.amplitude_to_db(np.abs(librosa.stft(sig)), ref = np.max)
 librosa.display.specshow(SIG, y_axis = 'linear', x_axis = 'time', sr = fs)
 ax = plt.subplot(3,2,3)
 ax.set(title = 'Ideal signal waveform')
-librosa.display.waveshow(ref, sr = fs, max_points = fs//2, x_axis = 'time')
+librosa.display.waveshow(ref, sr = fs, max_points = fs//2)
 plt.ylim([-0.7, 0.7])
 ax = plt.subplot(3,2,4)
 ax.set(title = 'Ideal signal spectrogram')
@@ -93,7 +93,7 @@ REF = librosa.amplitude_to_db(np.abs(librosa.stft(ref)), ref = np.max)
 librosa.display.specshow(REF, y_axis = 'linear', x_axis = 'time', sr = fs)
 ax = plt.subplot(3,2,5)
 ax.set(title = 'Recorded signal waveform')
-librosa.display.waveshow(dis_rs, sr = fs, max_points = fs//2, x_axis = 'time')
+librosa.display.waveshow(dis_rs, sr = fs, max_points = fs//2)
 plt.ylim([-0.7, 0.7])
 ax = plt.subplot(3,2,6)
 ax.set(title = 'Recorded signal spectrogram')
